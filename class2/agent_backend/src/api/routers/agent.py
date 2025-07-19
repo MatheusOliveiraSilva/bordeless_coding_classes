@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List
+from typing import List, Generator
 import json
-from langchain_core.messages import HumanMessage, AIMessage,BaseMessage
+from langchain_core.messages import HumanMessage, AIMessage,BaseMessage, ToolMessage
 from src.common.types import LLMConfig, LLMProvider
 from src.agent.state import AgentState
 from src.agent.graph import build_graph
@@ -35,8 +35,11 @@ def parse_chat_history(chat_history: List[ChatMessage]) -> List[BaseMessage]:
             messages.append(AIMessage(content=message.content))
     return messages
 
-def stream_response(graph, agent_input: AgentState):
-    for type, chunk in graph.stream(agent_input, stream_mode=["custom", "messages"]):
+def stream_response(graph, agent_input: AgentState) -> Generator[str, None, None]:
+    for type, chunk in graph.stream(
+        agent_input, 
+        stream_mode=["custom", "messages"]
+        ):
         yield f"{type}: {chunk}\n\n"
 
 @router.post("/chat")

@@ -43,5 +43,6 @@ def build_graph(tools: list[BaseTool]):
             END: END
         }
     )
+    graph_builder.add_edge("tools", "chatbot")
 
     return graph_builder.compile()
