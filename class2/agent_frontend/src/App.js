@@ -47,6 +47,11 @@ const App = () => {
     for (const line of lines) {
       if (line.startsWith('messages: ')) {
         try {
+          // Skip ToolMessage chunks - they're already handled via custom:
+          if (line.includes('ToolMessage(')) {
+            continue;
+          }
+          
           // Extract content from messages
           const contentMatch = line.match(/content='([^']*?)'/);
           if (contentMatch && contentMatch[1]) {
