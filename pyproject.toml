@@ -14,4 +14,8 @@ dependencies = [
     "python-dotenv",
     "ipykernel",
     "fastapi",
+    "uvicorn",
 ]
+
+[tool.setuptools.packages.find]
+include = ["class1*", "class2*"]
