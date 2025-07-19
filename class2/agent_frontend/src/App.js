@@ -86,28 +86,28 @@ const App = () => {
           if (toolResultMatch) {
             const result = toolResultMatch[1].trim();
             
-            // Find the most recent tool call to match with result
+            // Find the most recent tool call and update it with the result
             setMessages(prev => {
-              const lastToolCallIndex = prev.length - 1;
-              
-              for (let i = lastToolCallIndex; i >= 0; i--) {
+              // Find the index of the last tool_call
+              let lastToolCallIndex = -1;
+              for (let i = prev.length - 1; i >= 0; i--) {
                 if (prev[i].role === 'tool' && prev[i].type === 'tool_call') {
-                  // Add tool result after this tool call
-                  const toolResultMessage = {
-                    role: 'tool',
-                    type: 'tool_result',
-                    content: result,
-                    tool_call_id: prev[i].tool_call_id,
-                    name: prev[i].name
-                  };
-                  
-                  const newMessages = [...prev];
-                  newMessages.splice(i + 1, 0, toolResultMessage);
-                  return newMessages;
+                  lastToolCallIndex = i;
+                  break;
                 }
               }
               
-              return prev;
+              return prev.map((msg, index) => {
+                // Update the last tool_call message with result
+                if (index === lastToolCallIndex) {
+                  return {
+                    ...msg,
+                    type: 'tool_completed',
+                    result: result
+                  };
+                }
+                return msg;
+              });
             });
           }
         } catch (error) {
@@ -313,9 +313,9 @@ const App = () => {
                       <div className="tool-info">
                         <span className="tool-name">{msg.name}</span>
                         <span className="tool-time">{new Date().toLocaleTimeString()}</span>
-                        {msg.type === 'tool_result' && (
+                        {msg.result && (
                           <div className="tool-result-preview">
-                            {msg.content.length > 30 ? msg.content.substring(0, 30) + '...' : msg.content}
+                            {msg.result.length > 30 ? msg.result.substring(0, 30) + '...' : msg.result}
                           </div>
                         )}
                       </div>
@@ -337,11 +337,11 @@ const App = () => {
                             <pre className="tool-args">{JSON.stringify(msg.args, null, 2)}</pre>
                           </div>
                         )}
-                        {msg.type === 'tool_result' && (
+                        {msg.result && (
                           <div className="tool-detail-section">
                             <strong>Resultado:</strong>
                             <div className="tool-result">
-                              {msg.content}
+                              {msg.result}
                             </div>
                           </div>
                         )}
