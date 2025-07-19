@@ -8,8 +8,10 @@ dependencies = [
     "openai",
     "langchain",
     "langchain-openai",
+    "langchain-anthropic",
     "langgraph",
     "requests",
     "python-dotenv",
-    "ipykernel"
+    "ipykernel",
+    "fastapi",
 ]
