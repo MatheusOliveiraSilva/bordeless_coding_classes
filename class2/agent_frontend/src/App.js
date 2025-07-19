@@ -377,7 +377,6 @@ const App = () => {
             onKeyPress={handleKeyPress}
             placeholder="Type your message here..."
             disabled={isLoading}
-            rows="3"
           />
           <div className="input-buttons">
             {isLoading ? (
