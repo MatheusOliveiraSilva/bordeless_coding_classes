@@ -45,4 +45,3 @@ def build_graph(tools: list[BaseTool]):
     )
 
     return graph_builder.compile()
-
