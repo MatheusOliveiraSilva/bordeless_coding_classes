@@ -1,0 +1,152 @@
+.feedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.feedback-modal {
+  background: #1a1a1a;
+  color: #ffffff;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #333;
+  background: #242424;
+  border-radius: 12px 12px 0 0;
+}
+
+.feedback-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  color: #fff;
+  background: #333;
+}
+
+.feedback-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: #1a1a1a;
+}
+
+.feedback-text {
+  font-family: 'Courier New', Monaco, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #e0e0e0;
+  background: #0d0d0d;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.feedback-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: flex-end;
+  background: #242424;
+  border-radius: 0 0 12px 12px;
+}
+
+.close-action-button {
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.close-action-button:hover {
+  background: #555;
+  transform: translateY(-1px);
+}
+
+/* Scrollbar styling for dark theme */
+.feedback-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.feedback-content::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.feedback-content::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+.feedback-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .feedback-modal-overlay {
+    padding: 0.5rem;
+  }
+  
+  .feedback-modal {
+    max-height: 90vh;
+  }
+  
+  .feedback-header,
+  .feedback-actions {
+    padding: 0.75rem 1rem;
+  }
+  
+  .feedback-content {
+    padding: 1rem;
+  }
+  
+  .feedback-text {
+    font-size: 0.8rem;
+    padding: 0.75rem;
+  }
+} 

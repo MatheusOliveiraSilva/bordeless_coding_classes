@@ -1,0 +1,128 @@
+.message-input {
+  border-top: 1px solid #e1e8ed;
+  background: white;
+  padding: 1rem;
+}
+
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.input-container:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.message-textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 24px;
+  max-height: 120px;
+}
+
+.message-textarea::placeholder {
+  color: #6c757d;
+}
+
+.message-textarea:disabled {
+  opacity: 0.6;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+}
+
+.send-button,
+.stop-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0;
+}
+
+.send-button {
+  background: #007bff;
+  color: white;
+}
+
+.send-button:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.send-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.stop-button {
+  background: #dc3545;
+  color: white;
+}
+
+.stop-button:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.input-hint {
+  display: flex;
+  justify-content: center;
+}
+
+.hint-text {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-align: center;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .message-input {
+    padding: 0.75rem;
+  }
+  
+  .input-container {
+    padding: 0.5rem;
+  }
+  
+  .send-button,
+  .stop-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .message-textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+} 
