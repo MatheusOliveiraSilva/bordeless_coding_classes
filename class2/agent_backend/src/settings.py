@@ -27,3 +27,20 @@ ANTHROPIC_API_KEY: str | None = os.getenv("ANTHROPIC_API_KEY")
 ANTHROPIC_PARAMS: dict[str, str | None] = {
     "anthropic_api_key": ANTHROPIC_API_KEY,
 }
+
+# === API ===
+APP_NAME = "Agent Backend"
+APP_VERSION = "0.1.0"
+CORS_ORIGINS = ["*"]
+CORS_METHODS = ["*"]
+CORS_HEADERS = ["*"]
+
+API_CONFIG = {
+    "name": APP_NAME,
+    "version": APP_VERSION,
+    "cors": {
+        "origins": CORS_ORIGINS,
+        "methods": CORS_METHODS,
+        "headers": CORS_HEADERS,
+    }
+}
