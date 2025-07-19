@@ -37,7 +37,7 @@ def parse_chat_history(chat_history: List[ChatMessage]) -> List[BaseMessage]:
 
 def stream_response(graph, agent_input: AgentState):
     for type, chunk in graph.stream(agent_input, stream_mode=["custom", "messages"]):
-        yield f"{type}: {chunk}"
+        yield f"{type}: {chunk}\n\n"
 
 @router.post("/chat")
 def chat(agent_request: AgentRequest):
