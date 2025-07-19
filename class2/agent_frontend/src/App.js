@@ -12,9 +12,8 @@ const App = () => {
   const [llmProvider, setLlmProvider] = useState('openai');
   const [model, setModel] = useState('gpt-3.5-turbo');
   const [reasoning, setReasoning] = useState('medium');
-  const [showConfig, setShowConfig] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackContent, setFeedbackContent] = useState('');
+    const [showConfig, setShowConfig] = useState(false);
+  const [expandedTool, setExpandedTool] = useState(null);
 
   // Model options for each provider
   const modelOptions = {
@@ -48,18 +47,72 @@ const App = () => {
     for (const line of lines) {
       if (line.startsWith('messages: ')) {
         try {
-          // Extract content from the chunk format
-          const match = line.match(/content='([^']*?)'/);
-          if (match && match[1]) {
-            content += match[1];
+          // Extract content from messages
+          const contentMatch = line.match(/content='([^']*?)'/);
+          if (contentMatch && contentMatch[1]) {
+            content += contentMatch[1];
           }
+
         } catch (error) {
           console.warn('Error parsing line:', line, error);
         }
       } else if (line.startsWith('custom: ')) {
-        // Handle custom type responses
-        setShowFeedback(true);
-        setFeedbackContent(prev => prev + line.replace('custom: ', '') + '\n');
+        // Handle complete tool call and tool result data
+        try {
+          const customData = line.replace('custom: ', '');
+          
+          // Handle Tool_call
+          const toolCallMatch = customData.match(/\{'Tool_call': ({.*})\}/);
+          if (toolCallMatch) {
+            // Replace single quotes with double quotes for valid JSON
+            const jsonString = toolCallMatch[1].replace(/'/g, '"');
+            const toolCallData = JSON.parse(jsonString);
+            
+            // Add tool call to messages
+            const toolCallMessage = {
+              role: 'tool',
+              type: 'tool_call',
+              content: `Calling function: ${toolCallData.name}`,
+              tool_call_id: toolCallData.id,
+              name: toolCallData.name,
+              args: toolCallData.args
+            };
+            
+            setMessages(prev => [...prev, toolCallMessage]);
+          }
+          
+          // Handle Tool_result
+          const toolResultMatch = customData.match(/\{'Tool_result': ([^}]+)\}/);
+          if (toolResultMatch) {
+            const result = toolResultMatch[1].trim();
+            
+            // Find the most recent tool call to match with result
+            setMessages(prev => {
+              const lastToolCallIndex = prev.length - 1;
+              
+              for (let i = lastToolCallIndex; i >= 0; i--) {
+                if (prev[i].role === 'tool' && prev[i].type === 'tool_call') {
+                  // Add tool result after this tool call
+                  const toolResultMessage = {
+                    role: 'tool',
+                    type: 'tool_result',
+                    content: result,
+                    tool_call_id: prev[i].tool_call_id,
+                    name: prev[i].name
+                  };
+                  
+                  const newMessages = [...prev];
+                  newMessages.splice(i + 1, 0, toolResultMessage);
+                  return newMessages;
+                }
+              }
+              
+              return prev;
+            });
+          }
+        } catch (error) {
+          console.warn('Error parsing custom data:', error);
+        }
       }
     }
     
@@ -75,8 +128,7 @@ const App = () => {
     setCurrentMessage('');
     setIsLoading(true);
     setStreamingMessage('');
-    setShowFeedback(false);
-    setFeedbackContent('');
+    setExpandedTool(null);
 
     // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
@@ -145,6 +197,7 @@ const App = () => {
           setMessages(prev => [...prev, aiMessage]);
         }
         
+        // Clear states
         setStreamingMessage('');
         setIsLoading(false);
       }
@@ -242,9 +295,66 @@ const App = () => {
         <div className="messages">
           {messages.map((msg, idx) => (
             <div key={idx} className={`message ${msg.role}`}>
-              <div className="message-content">
-                {msg.content}
-              </div>
+              {msg.role === 'tool' ? (
+                // Render tool calls/results
+                <div className="tool-calls-container">
+                  <div className={`tool-call-item ${msg.type === 'tool_call' ? 'calling' : 'completed'}`}>
+                    <div 
+                      className="tool-call-summary"
+                      onClick={() => setExpandedTool(expandedTool === `${msg.tool_call_id}-${idx}` ? null : `${msg.tool_call_id}-${idx}`)}
+                    >
+                      <div className="tool-status-indicator">
+                        {msg.type === 'tool_call' ? (
+                          <div className="spinner"></div>
+                        ) : (
+                          <div className="check-icon">✓</div>
+                        )}
+                      </div>
+                      <div className="tool-info">
+                        <span className="tool-name">{msg.name}</span>
+                        <span className="tool-time">{new Date().toLocaleTimeString()}</span>
+                        {msg.type === 'tool_result' && (
+                          <div className="tool-result-preview">
+                            {msg.content.length > 30 ? msg.content.substring(0, 30) + '...' : msg.content}
+                          </div>
+                        )}
+                      </div>
+                      <div className="expand-toggle">
+                        <span className={`expand-icon ${expandedTool === `${msg.tool_call_id}-${idx}` ? 'expanded' : ''}`}>
+                          &lt;&gt;
+                        </span>
+                      </div>
+                    </div>
+                    {expandedTool === `${msg.tool_call_id}-${idx}` && (
+                      <div className="tool-call-details">
+                        <div className="tool-detail-section">
+                          <strong>Função:</strong> 
+                          <span className="function-name">{msg.name}</span>
+                        </div>
+                        {msg.args && (
+                          <div className="tool-detail-section">
+                            <strong>Argumentos:</strong>
+                            <pre className="tool-args">{JSON.stringify(msg.args, null, 2)}</pre>
+                          </div>
+                        )}
+                        {msg.type === 'tool_result' && (
+                          <div className="tool-detail-section">
+                            <strong>Resultado:</strong>
+                            <div className="tool-result">
+                              {msg.content}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                // Render regular messages
+                <div className="message-content">
+                  {msg.content}
+                </div>
+              )}
             </div>
           ))}
           
@@ -283,21 +393,10 @@ const App = () => {
         </div>
       </div>
 
-      {showFeedback && (
-        <div className="feedback-overlay" onClick={() => setShowFeedback(false)}>
-          <div className="feedback-window" onClick={(e) => e.stopPropagation()}>
-            <div className="feedback-header">
-              <h3>Agent Feedback</h3>
-              <button onClick={() => setShowFeedback(false)}>×</button>
-            </div>
-            <div className="feedback-content">
-              <pre>{feedbackContent}</pre>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
 
 export default App;
+
