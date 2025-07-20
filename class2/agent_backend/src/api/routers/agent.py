@@ -17,6 +17,7 @@ router = APIRouter(
 graph = build_graph(TOOLS)
 
 class ChatMessage(BaseModel):
+    # example: {"role": "user", "content": "What is 2 + 2?"}
     role: str
     content: str
 

@@ -47,7 +47,6 @@ class LLM():
         Returns:
             BaseChatModel: A LangChain chat model.
         """
-
         kwargs = self._sanitize_config(self.config, self.provider)
         return self.langchain_map[self.provider]["langchain_chat_model"](
             **self.langchain_map[self.provider]["params"],
